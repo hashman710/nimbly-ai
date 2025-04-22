@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gerador de Assinaturas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f2f5;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(90deg, #b22234, #3c3b6e);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 700px;
+      background: #fff;
+      padding: 30px;
+      margin: 30px auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #3c3b6e;
+      color: white;
+      font-weight: bold;
+      border: none;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #b22234;
+    }
+    .output, .preview {
+      margin-top: 20px;
+      background: #fafafa;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+    }
+    h2 {
+      color: #3c3b6e;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>Gerador de Assinaturas Loupen</header>
+  <div class="container">
+    <h2>Preencha os dados</h2>
+    <input type="text" id="nome" placeholder="Nome">
+    <input type="text" id="cargo" placeholder="Cargo">
+    <input type="text" id="linkedin" placeholder="URL do LinkedIn">
+    <input type="file" id="fotoUpload" accept="image/*">
+    <button onclick="gerarAssinatura()">Gerar Assinatura</button>
+    <div class="preview" id="preview"></div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <img id="image" style="max-width: 100%; display: block;">
+      <button onclick="confirmarCorte()">Confirmar Corte</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script>
+    let cropper;
+    const modal = document.getElementById('modal');
+    const imageElement = document.getElementById('image');
+
+    document.getElementById('fotoUpload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          imageElement.src = event.target.result;
+          modal.style.display = 'flex';
+          if (cropper) cropper.destroy();
+          cropper = new Cropper(imageElement, {
+            aspectRatio: 1,
+            viewMode: 1,
+            background: false,
+            autoCropArea: 1
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function confirmarCorte() {
+      modal.style.display = 'none';
+    }
+
+    function gerarAssinatura() {
+      const nome = document.getElementById('nome').value;
+      const cargo = document.getElementById('cargo').value;
+      const linkedin = document.getElementById('linkedin').value;
+      const telefone = '0800.591.0365 | +55 11 4200-1124 | Ramal 1004';
+
+      let foto = 'https://loupen.com.br/wp-content/uploads/2024/04/user.png';
+      if (cropper) {
+        const croppedCanvas = cropper.getCroppedCanvas({ width: 160, height: 160 });
+        foto = croppedCanvas.toDataURL();
+      }
+
+      const assinaturaHTML = `
+      <table style="width: 100%; max-width: 500px;">
+        <tr>
+          <td width="25%" valign="middle">
+            <img src="${foto}" style="width: 160px; height: 160px; border-radius: 50%; display: block; object-fit: cover;">
+          </td>
+          <td width="75%" valign="middle" style="padding:5px 0 5px 20px">
+            <h3 style="margin:0 0 5px; font-size: 18px; line-height: 1.2; font-family: sans-serif; font-weight: bold; color: #b22234;">${nome}</h3>
+            <h5 style="margin:0 0 5px; font-size: 14px; line-height: 0.8; font-family: sans-serif; font-weight: normal; padding-bottom: 2px;">${cargo}</h5>
+            <p style="margin:0 0 5px; line-height: 1.8; font-family: sans-serif; font-size: 12px; padding-top: 2px;">
+              <b>Telefone:</b> ${telefone}</br>
+              <b><a href="${linkedin}" style="color: #3c3b6e;">Já estamos conectados no LinkedIn?</a></b>
+            </p>
+            <a href="https://loupen.com.br/">
+              <img src="https://loupen.com.br/wp-content/uploads/2023/09/Assinatura_Corrigida-min.gif" style="width: 60%; min-width: 80px; display: block; padding-top: 3px;">
+            </a>
+          </td>
+        </tr>
+      </table>`;
+
+      document.getElementById('preview').innerHTML = assinaturaHTML;
+    }
+  </script>
+</body>
+</html>
