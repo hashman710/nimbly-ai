@@ -38,7 +38,7 @@
     "react-big-calendar": "^1.18.0",
     "react-countup": "^6.5.3",
     "react-day-picker": "^8.10.1",
-    "react-dom": "^^18.3.1",
+    "react-dom": "^18.3.1",
     "react-resizable": "^3.0.5",
     "react-tsparticles": "^2.12.2",
     "reactflow": "^11.11.4",
